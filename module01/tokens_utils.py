@@ -10,7 +10,7 @@ import tiktoken
 from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
+load_dotenv(override=True)   # .env wins over anything an editor put in the environment
 
 # ---------------------------------------------------------------- tokenizer
 # gpt-oss models use the o200k_harmony encoding; tiktoken ships it. For other
@@ -33,9 +33,9 @@ def show_tokens(text: str, encoding: str = ENCODING) -> list[str]:
 # ---------------------------------------------------------------- cost
 # Indicative price cards, USD per 1M tokens (edit these — prices change).
 PRICE_CARDS = {
-    "groq gpt-oss-20b": {"input": 0.10, "output": 0.50},
-    "frontier small":   {"input": 0.15, "output": 0.60},
-    "frontier large":   {"input": 2.50, "output": 10.00},
+    "groq gpt-oss-20b": {"input": 0.075, "output": 0.30},   # indicative, Sep 2026 - verify
+    "frontier economy": {"input": 0.50,  "output": 2.50},   # indicative tier
+    "frontier flagship": {"input": 5.00, "output": 25.00},  # indicative tier
 }
 USD_TO_INR = 84.0
 

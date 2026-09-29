@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
+load_dotenv(override=True)   # .env wins over anything an editor put in the environment
 client = OpenAI(base_url=os.getenv("BASE_URL"), api_key=os.getenv("API_KEY"))
 MODEL = os.getenv("MODEL")
 
@@ -22,4 +22,3 @@ for chunk in stream:
     if chunk.usage:
         u = chunk.usage
         print(f"\n\nprompt={u.prompt_tokens} completion={u.completion_tokens} total={u.total_tokens}")
-        break

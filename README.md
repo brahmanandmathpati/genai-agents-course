@@ -91,6 +91,16 @@ uv run pytest tests/test_s09.py          # checkpoint
 ```
 Pre-read: `module01/reading_tokens.md` (10 minutes). First run of `tiktoken` downloads its encoding file once (needs internet).
 
+## Session 10 — the model landscape
+
+```powershell
+git pull
+uv sync
+uv run jupyter lab module01/s10_model_matrix.ipynb
+uv run pytest tests/test_s10.py          # checkpoint (works offline)
+```
+Pre-read: `module01/reading_landscape.md` (10 minutes). Terms: `module01/terms_s10.md`. Catalog numbers are **indicative** — verifying two of them is part of the lab. To submit: run the last notebook cell, then upload `module01/s10_matrix_output.md` through the submission form (personal repositories start at Session 14).
+
 ## Layout
 ```
 module01/                   Session 9b notebook, helpers, pre-read
@@ -98,6 +108,7 @@ hello.py                    Session 2 first call
 list_models.py              which models your key can use
 tests/test_setup.py         Session 2 checkpoint
 tests/test_s09.py           Session 9b checkpoint
+tests/test_s10.py           Session 10 checkpoint
 cheatsheet/python-for-agents.md
 .env.example                copy to .env
 pyproject.toml              pinned dependencies (uv sync)

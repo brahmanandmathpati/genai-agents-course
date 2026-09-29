@@ -3,7 +3,7 @@ import os
 import sys
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)   # .env wins over anything an editor put in the environment
 
 
 def test_python_version():
