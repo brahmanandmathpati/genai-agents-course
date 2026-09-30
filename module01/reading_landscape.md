@@ -27,5 +27,21 @@ Some data may not leave your building, or your country, however good and cheap t
 
 ## Three questions to arrive with
 - A bank wants a chatbot for public product questions *and* a system that reads customers' salary slips. Should they use the same model? Why or why not?
+  
+  -> One answers general questions about bank products to the public — anyone can ask, the topics are broad but not sensitive to any one person's private data.
+
+  -> The other reads a customer's salary slip — a structured document, likely containing precise numbers (income, deductions, employer name) that need to be extracted correctly, not just discussed.
+
 - Your laptop can run a small model for free. Why can't it be the FAQ bot for 20,000 calls a day?
+Think about what's different between you running the model once on your laptop, versus it serving as the FAQ bot for a business.
+
+A few things to consider:
+
+Concurrency — when you run the model, it's just you asking one question at a time. If 20,000 calls come in over a day, how many might arrive at the same moment? What happens to your laptop if 50 people try to talk to it simultaneously?
+
+Uptime — your laptop sleeps, reboots, loses wifi, runs out of battery. What does the FAQ bot need instead?
+
+Capacity vs. free — "free" on your laptop means you're not paying money, but what resource are you spending? (Hint: think about what's finite on your machine — CPU/GPU, RAM, electricity, your own time.)
+
 - A leaderboard says Model A beats Model B by 4 points. What would you still want to check before switching?
+
