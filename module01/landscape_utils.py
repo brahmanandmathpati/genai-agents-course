@@ -143,7 +143,12 @@ RUBRIC = """Quality rubric (1-5), fill in yourself after reading the answer:
  4  Both numbers right but format or wording off
  3  One number right, or right numbers with a wrong conclusion
  2  Both numbers wrong but the method is visible
- 1  Wrong and confident, or no answer"""
+ 1  Wrong and confident, or no answer
+
+Correct answer:
+ EMI   = Rs 17,594.09 per month
+ Ratio = (17,594.09 + 8,000) / 60,000 = 42.7%
+ Test  = YES, under the 50% limit"""
 
 
 # ---------------------------------------------------------------- latency (needs a live client)

@@ -27,21 +27,14 @@ Some data may not leave your building, or your country, however good and cheap t
 
 ## Three questions to arrive with
 - A bank wants a chatbot for public product questions *and* a system that reads customers' salary slips. Should they use the same model? Why or why not?
-  
-  -> One answers general questions about bank products to the public — anyone can ask, the topics are broad but not sensitive to any one person's private data.
 
-  -> The other reads a customer's salary slip — a structured document, likely containing precise numbers (income, deductions, employer name) that need to be extracted correctly, not just discussed.
+  -> No. The two jobs have completely different risk profiles and requirements. The FAQ bot answers general, public questions — no customer data, mistakes cost little beyond a mildly unhelpful reply, and it needs to be cheap at high volume. The salary-slip reader processes real customer PII (income, deductions, employer) that often has a hard data-residency constraint, and a mistake there (misreading a number) can feed directly into a loan decision, which is a much higher-stakes failure mode. Applying the course's method: the two jobs would get eliminated down to different survivor sets (the hosted FAQ model is excluded from the document job by the data-residency hard constraint) and scored with different weights (cost-heavy for FAQ, quality-heavy for documents) — so they land on different models almost by construction, not by preference.
 
 - Your laptop can run a small model for free. Why can't it be the FAQ bot for 20,000 calls a day?
-Think about what's different between you running the model once on your laptop, versus it serving as the FAQ bot for a business.
 
-A few things to consider:
-
-Concurrency — when you run the model, it's just you asking one question at a time. If 20,000 calls come in over a day, how many might arrive at the same moment? What happens to your laptop if 50 people try to talk to it simultaneously?
-
-Uptime — your laptop sleeps, reboots, loses wifi, runs out of battery. What does the FAQ bot need instead?
-
-Capacity vs. free — "free" on your laptop means you're not paying money, but what resource are you spending? (Hint: think about what's finite on your machine — CPU/GPU, RAM, electricity, your own time.)
+  -> Three things break down at that volume: **concurrency** (your laptop serves one conversation at a time; 20,000 calls/day means many requests can arrive at once, and a laptop has no way to serve dozens of simultaneous users without queuing or crashing), **uptime** (a laptop sleeps, loses wifi, reboots, and isn't built to stay reachable 24/7 the way a production service needs to be), and **capacity vs. free** ("free" just means no per-token bill — you're still spending finite CPU/GPU, RAM, and electricity, and a laptop's throughput tops out far below what 20,000 calls/day requires, as the course's own notebook measured: ~5,000 calls/day before this exact kind of local setup can't keep up).
 
 - A leaderboard says Model A beats Model B by 4 points. What would you still want to check before switching?
+
+  -> First, whether the benchmark actually measures the task I care about — a 4-point gain on a coding or trivia benchmark says nothing about quality on, say, loan-document extraction. Second, whether 4 points is a real difference or just noise — benchmark scores can vary run-to-run or depend on a small test set, so I'd want to know the variance, not just the headline number. Third, what the leaderboard doesn't show at all: cost, latency, context window, rate limits, and — most importantly — how the model actually performs on *my own* prompts and data, since that's the only test the course's method treats as final ("verify the winner on your own examples").
 

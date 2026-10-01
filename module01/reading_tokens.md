@@ -13,5 +13,13 @@
 
 **Three questions to arrive with**
 - If Telugu costs three times as many tokens as English, what does that mean for a bank whose customers write in Telugu?
+
+  -> Every message from a Telugu-speaking customer costs roughly 3× more to process and eats 3× more of the context window than the same request in English — purely because of the tokenizer's vocabulary bias toward English and code, not because the request is any more complex. That's a real cost and capacity penalty tied to language, which matters for a bank whose customers don't all write in English.
+
 - Your chatbot has a 30-turn conversation. What is in the context window at turn 30?
+
+  -> Whatever still fits, in chronological order: the system prompt (normally kept throughout, since the model needs it to behave correctly) plus as many of the most recent turns as the token budget allows. If the full 30-turn history doesn't fit, the oldest turns are the ones dropped to make room — and that eviction is a decision the application's memory strategy makes (sliding window, summarization, retrieval), not something the model does on its own.
+
 - What can an embedding model *not* do?
+
+  -> It can't answer a question or generate text — it only outputs a vector, so there's nothing to read on its own. It can't explain *why* two things are similar, only that they're statistically close in its training data. And it can struggle with narrow domain jargon or acronyms that are rare in its training corpus — e.g. a bank's own term like "EMI" might not land sensibly near "loan" in embedding space even though the two are obviously related, because the model has only seen patterns, not real understanding of the concept.
