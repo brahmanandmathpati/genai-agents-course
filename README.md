@@ -1,116 +1,77 @@
-# GenAI · Agentic AI · AI Agents — course repo
+# GenAI · Agentic AI · AI Agents — course work
 
-Instructor: **Ajit Byru** · `ajitbyru@gmail.com` · github.com/byruajit
+My working repo for the GenAI / Agentic AI / AI Agents course (instructor: Ajit Byru, [byruajit/genai-agents-course](https://github.com/byruajit/genai-agents-course)). It holds the course scaffolding plus my notebooks, notes and experiments, one `moduleNN/` folder at a time.
 
-This repository is the single source of truth for the course: every command shown in class is here, character for character. If a slide and this README disagree, the README wins.
+**Currently covered:** Module 1 — tokens, cost and context (Session 9b) and the model landscape (Session 10).
 
-**Rule for the whole course: every Python command starts with `uv run`.** Never plain `python`, never `conda`. Have Anaconda? Keep it — it is never used and never touched. See `(base)` in your prompt? Ignore it.
+## What's in Module 1
 
-> **Starting at Session 9?** Session 1's Git section is covered by the Git & GitHub webinar — watch it before Session 14. Do only step 8 of Session 1 (clone this repo), then all of Session 2's setup.
+### Session 9b — tokens, cost, context, embeddings
+- [s09_tokens.ipynb](module01/s09_tokens.ipynb) — count tokens with `tiktoken`, compare against the `usage` a provider reports, turn tokens into rupees, and plot ten word embeddings in 2-D with PCA.
+- [tokens_utils.py](module01/tokens_utils.py) — helpers: `count_tokens`, `show_tokens`, `cost_inr`, `usage_for`, `embed_via_ollama`, `pca_2d`.
+- [reading_tokens.md](module01/reading_tokens.md) · [terms_s09.md](module01/terms_s09.md) — pre-read and glossary.
 
----
+**Key finding.** `tiktoken` counts only your text. A provider's `usage` also counts the chat-template wrapper the model receives. On Groq `openai/gpt-oss-20b` that wrapper is a fixed 71 tokens per request, and subtracting it reproduces the `tiktoken` count exactly. Token counts are only comparable within one tokenizer: on an Ollama model, the same Telugu text cost about 4× more tokens than in `o200k_harmony`.
 
-## Session 1 — Git & GitHub
+| text | tiktoken | Groq usage | Groq minus wrapper | Ollama usage |
+|---|---|---|---|---|
+| English | 16 | 87 | 16 | 41 |
+| Telugu | 25 | 96 | 25 | 132 |
+| Python | 35 | 106 | 35 | 61 |
+| JSON | 25 | 96 | 25 | 49 |
 
-Two repos live side by side in `Documents`: **genai-course-work** (yours — you push) and **genai-agents-course** (this one — you pull).
+### Session 10 — the model landscape
+Method: **eliminate** with hard constraints (data residency, latency, context, volume) → **score** survivors on cost, latency and quality with business-chosen weights → **verify** on your own examples.
 
-| # | Step | Command |
-|---|---|---|
-| 1 | Install Git and VS Code, then **close and reopen the terminal** (already have them? verify only) | `winget install --id Git.Git -e` · `winget install --id Microsoft.VisualStudioCode -e` · `git --version` · `code --version` |
-| 2 | Identity — real name, professional email | `git config --global user.name "Your Name"` · `git config --global user.email "you@example.com"` · `git config --global init.defaultBranch main` · `git config --global core.autocrlf true` (Windows) |
-| 3 | Create **your** repo in the browser | github.com → New → `genai-course-work` → Public → tick "Add a README file" → Create |
-| 4 | Clone it | `cd ~\Documents` · `git clone https://github.com/<your-username>/genai-course-work.git` · `cd genai-course-work` · `code .` |
-| 5 | First commit (edit README.md) | `git status` · `git add README.md` · `git commit -m "Add intro to README"` · `git push` |
-| 6 | Second commit (create `notes/session01.md`) | `git add .` · `git commit -m "Session 1 notes"` · `git push` · `git log --oneline` |
-| 7 | Branch, change, merge | `git switch -c experiment` · edit · `git add . && git commit -m "Experiment"` · `git switch main` · `git merge experiment` · `git push` · `git branch -d experiment` |
-| 8 | Clone this course repo alongside | `cd ~\Documents` · `git clone https://github.com/byruajit/genai-agents-course.git` · `cd genai-agents-course` · `type .gitignore` · `git pull` |
-| 9 | **Checkpoint** | Your GitHub page shows ≥ 2 commits and the merge; `git config --global --list` shows your name and email |
+- [s10_model_matrix.ipynb](module01/s10_model_matrix.ipynb) — runs the method over the catalog for several scenarios and times real models on the same prompt.
+- [landscape_utils.py](module01/landscape_utils.py) — `rank`, `eligible`, `monthly_cost_usd/inr`, `time_stream`, and the quality checker (`emi`, `check_answer`, `RUBRIC`).
+- [models_catalog.json](module01/models_catalog.json) — model catalog. Numbers are **indicative** (Sep 2026); quality and latency are starting guesses to be replaced with measurements.
+- [reading_landscape.md](module01/reading_landscape.md) · [terms_s10.md](module01/terms_s10.md) — pre-read (with my answers) and glossary.
 
-Start every session with `git pull` in this repo.
+**The test prompt.** Rs 60,000/month income, Rs 8,000 existing EMIs, Rs 8,00,000 loan at 11.5% for 60 months. Correct answer: EMI **Rs 17,594.09**, ratio **42.7%**, so **yes**, under the 50% limit. `check_answer` accepts an EMI within 1% and a ratio within 0.6 points; `RUBRIC` is the 1–5 manual score.
 
-**Secrets:** `.env` is in `.gitignore`, so `git add` ignores it. If a key ever reaches a commit it is public within minutes — revoke it in the Groq console and create a new one.
+## Setup
 
----
-
-## Session 2 — set up your machine (Windows, PowerShell)
-
-Already have VS Code, Git or Python? Keep them. Skip the matching install line and run the version check only. Everyone runs steps 1, 2 and 5–8.
-
-| # | Step | Command |
-|---|---|---|
-| 1 | Install uv, then **close and reopen the terminal** (have uv? `uv self update`) | `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 \| iex"` then `uv self version` |
-| 1b | Only if step 1 still says "not recognized" after reopening | `[Environment]::SetEnvironmentVariable('Path', $env:Path + ';' + $HOME + '\.local\bin', 'User')` → reopen |
-| 2 | Python 3.12 via uv (do this even if you have Python; it never touches yours) | `uv python install 3.12` then `uv python list` |
-| 3 | Git and VS Code, then reopen the terminal (already installed? verify only) | `winget install --id Git.Git -e` · `winget install --id Microsoft.VisualStudioCode -e` · `git --version` · `code --version` |
-| 4 | Clone and open — never in `C:\WINDOWS\system32` | `cd ~\Documents` · `git clone https://github.com/byruajit/genai-agents-course.git` · `cd genai-agents-course` · `code .` |
-| 5 | Install pinned packages (VS Code terminal, Ctrl+`) | `uv sync` |
-| 6 | Private config — paste **your own** Groq key as `API_KEY` (free: console.groq.com → API Keys → Create); do not touch `MODEL`; no quotes; no trailing space | `copy .env.example .env` (Mac/Linux: `cp .env.example .env`) |
-| 7 | First LLM call — read the token count | `uv run python hello.py` |
-| 8 | **Checkpoint** | `uv run pytest tests/test_setup.py` → `3 passed` |
-| 9 | Background / homework | ollama.com → install → `ollama pull llama3.2:3b` |
-
-### Mac / Linux differences
-Step 1: `curl -LsSf https://astral.sh/uv/install.sh | sh` · Step 3: `xcode-select --install` (Mac) or `sudo apt install git` (Ubuntu); VS Code from code.visualstudio.com, then Command Palette → "Shell Command: Install code command in PATH" · Step 6: `cp` not `copy`. Everything else is identical.
-
-### Switching to Ollama (rate limits, or private data)
-In `.env`, comment the three Groq lines and uncomment the three Ollama lines. No code changes.
-
----
-
-## Troubleshooting — the three errors that cover almost everything
-
-**`uv` is not recognized** — you did not reopen the terminal. Close every terminal (including VS Code's) and open again. Still failing → step 1b.
-
-**401 invalid API key** — open `.env` (not `.env.example`). No quotes around the key, no trailing space, not the placeholder. If in doubt, create a new key in the Groq console and paste it again.
-
-**Ollama: model not found / connection refused** — not found → `ollama pull llama3.2:3b`. Connection refused → Ollama is not running: check the tray icon, or run `ollama serve` in a second terminal.
-
-**Model not found (404)** — the pinned model was retired. Run `uv run python list_models.py`, pick a current model, and tell the instructor; do not change `MODEL` on your own.
-
-Also seen: a warning that `UV_NATIVE_TLS` is deprecated — harmless, ignore. `uv version` (no dashes) errors outside a project — use `uv self version`.
-
----
-
-## Keys
-You create your own free Groq key at console.groq.com. It lives in `.env` and nowhere else. If it ever appears in chat, code or a screenshot, revoke it in the console immediately and create a new one.
-
-## Links
-- Community channel: _(added by instructor)_
-- Submission form: _(added by instructor)_
-- Baseline quiz: _(added by instructor)_
-- Fix videos: _(coming)_
-
-## Session 9b — tokens, cost, context, embeddings
+Requires [uv](https://docs.astral.sh/uv/) and Python 3.12 (pinned in `.python-version`). Every Python command goes through `uv run`.
 
 ```powershell
-git pull
-uv sync                                  # adds jupyter, tiktoken, numpy, matplotlib
-ollama pull nomic-embed-text             # 270 MB, for the embeddings section (optional: a cached copy is used if Ollama is absent)
+uv sync                           # install pinned dependencies
+copy .env.example .env            # then paste your own Groq key as API_KEY
+uv run python hello.py            # first LLM call, prints the token count
+uv run pytest                     # all checkpoints
+```
+
+`.env` is git-ignored. Never commit a key; if one leaks, revoke it in the Groq console.
+
+**Switching provider.** In `.env`, comment the three Groq lines and uncomment the three Ollama lines. No code changes. For local models: `ollama pull llama3.2:3b` and `ollama pull nomic-embed-text` (the embeddings section falls back to a cached copy if Ollama is absent).
+
+### Running Module 1
+
+```powershell
 uv run jupyter lab module01/s09_tokens.ipynb
-uv run pytest tests/test_s09.py          # checkpoint
-```
-Pre-read: `module01/reading_tokens.md` (10 minutes). First run of `tiktoken` downloads its encoding file once (needs internet).
-
-## Session 10 — the model landscape
-
-```powershell
-git pull
-uv sync
 uv run jupyter lab module01/s10_model_matrix.ipynb
-uv run pytest tests/test_s10.py          # checkpoint (works offline)
+uv run pytest tests/test_s09.py tests/test_s10.py
 ```
-Pre-read: `module01/reading_landscape.md` (10 minutes). Terms: `module01/terms_s10.md`. Catalog numbers are **indicative** — verifying two of them is part of the lab. To submit: run the last notebook cell, then upload `module01/s10_matrix_output.md` through the submission form (personal repositories start at Session 14).
+
+`tests/test_s10.py` works offline. `tiktoken` downloads its encoding file once on first use. Pinned model `MODEL` is set in `.env.example`; if it returns 404, list current models with `uv run python list_models.py`.
 
 ## Layout
+
 ```
-module01/                   Session 9b notebook, helpers, pre-read
-hello.py                    Session 2 first call
-list_models.py              which models your key can use
-tests/test_setup.py         Session 2 checkpoint
-tests/test_s09.py           Session 9b checkpoint
-tests/test_s10.py           Session 10 checkpoint
-cheatsheet/python-for-agents.md
-.env.example                copy to .env
-pyproject.toml              pinned dependencies (uv sync)
+module01/            notebooks, helpers, catalog, pre-reads and glossaries
+tests/               test_setup.py, test_s09.py, test_s10.py
+cheatsheet/          python-for-agents.md — the six patterns
+hello.py             first LLM call
+list_models.py       models your key can use
+.env.example         copy to .env
+pyproject.toml       pinned dependencies (uv sync)
 ```
-Modules are added as the course progresses (`module01/ … module14/`).
+
+Further modules are added as the course progresses.
+
+## Troubleshooting
+
+- **`uv` is not recognized** — close every terminal (including VS Code's) and reopen.
+- **401 invalid API key** — check `.env`, not `.env.example`: no quotes, no trailing space, not the placeholder.
+- **Ollama connection refused** — Ollama isn't running; check the tray icon or run `ollama serve`.
+- **404 model not found** — the pinned model was retired; run `list_models.py` and tell the instructor.
